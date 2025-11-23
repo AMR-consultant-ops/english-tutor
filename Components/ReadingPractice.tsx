@@ -269,13 +269,15 @@ export const ReadingPractice: React.FC = () => {
   // --- RENDER STEP 1: TOPICS ---
   if (step === 'TOPICS') {
     return (
-      <div className="p-6 space-y-6 h-full overflow-y-auto pb-32 bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+      // Added pt-24 to clear global header
+      <div className="p-6 pt-24 space-y-6 h-full overflow-y-auto pb-32 bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
         <div className="text-center space-y-2 mb-4">
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Práctica de Lectura</h2>
           <p className="text-slate-500 dark:text-slate-400">Lee sobre temas de interés.</p>
         </div>
         
-        <div className="grid grid-cols-2 gap-4">
+        {/* Changed grid-cols-2 to sm:grid-cols-2 to fix squashed items on narrow screens */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {TOPICS.map((t) => {
             const isDone = isCompleted(t.id);
             return (
@@ -309,7 +311,7 @@ export const ReadingPractice: React.FC = () => {
   // --- RENDER STEP 2: STORY OPTIONS ---
   if (step === 'OPTIONS') {
     return (
-      <div className="p-6 h-full overflow-y-auto bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+      <div className="p-6 pt-24 h-full overflow-y-auto bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
         <div className="flex items-center gap-4 mb-6">
             <button onClick={resetToTopics} className="p-2 bg-white dark:bg-slate-800 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-300 border border-slate-200 dark:border-transparent">
                 ←
@@ -352,7 +354,8 @@ export const ReadingPractice: React.FC = () => {
   return (
     <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
       {/* Header */}
-      <div className="p-6 bg-white/80 dark:bg-slate-800/50 backdrop-blur border-b border-slate-200 dark:border-slate-700">
+      {/* Added pt-20 to clear fixed header */}
+      <div className="p-6 pt-24 bg-white/80 dark:bg-slate-800/50 backdrop-blur border-b border-slate-200 dark:border-slate-700">
         <div className="flex items-center justify-between mb-4">
            <button onClick={() => setStep('OPTIONS')} className="text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-white text-sm flex items-center gap-1">
              ← Atrás
