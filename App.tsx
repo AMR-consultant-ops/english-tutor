@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LiveTutor } from './components/LiveTutor.tsx';
+import { LiveTutor } from './components/LiveTutor';
 import { TTSDrill } from './components/TTSDrill';
 import { QuickHelp } from './components/QuickHelp';
 import { ReadingPractice } from './components/ReadingPractice';
@@ -164,3 +164,4 @@ function App() {
 }
 
 export default App;
+
