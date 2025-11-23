@@ -1,0 +1,7 @@
+{
+  "name": "English Start: AI Tutor",
+  "description": "A real-time voice tutor for absolute beginners, powered by Gemini 2.5 Live API.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
