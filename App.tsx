@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LiveSession } from './components/LiveSession';
+import { LiveTutor } from './components/LiveTutor.tsx';
 import { TTSDrill } from './components/TTSDrill';
 import { QuickHelp } from './components/QuickHelp';
 import { ReadingPractice } from './components/ReadingPractice';
@@ -26,7 +26,7 @@ function App() {
   const renderContent = () => {
     switch (mode) {
       case AppMode.LIVE_TUTOR:
-        return <LiveSession />;
+        return <LiveTutor />;
       case AppMode.READING:
         return <ReadingPractice />;
       case AppMode.DRILLS:
