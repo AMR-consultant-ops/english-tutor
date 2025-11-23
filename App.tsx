@@ -31,7 +31,8 @@ function App() {
         return <ReadingPractice />;
       case AppMode.DRILLS:
         return (
-          <div className="h-full overflow-y-auto pb-24 bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+          // Added pt-24 to clear the fixed header
+          <div className="h-full overflow-y-auto pt-24 pb-24 bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
             <header className="p-6 pb-0">
                <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-brand-400 dark:from-brand-400 dark:to-brand-200">
                  Tools & Practice
@@ -141,7 +142,7 @@ function App() {
        </div>
 
        {mode !== AppMode.HOME && (
-         <div className="absolute top-0 left-0 w-full z-40 p-4 flex justify-between items-center bg-gradient-to-b from-white/90 via-white/50 to-transparent dark:from-slate-900/90 dark:via-slate-900/50 pointer-events-none">
+         <div className="absolute top-0 left-0 w-full z-40 p-4 flex justify-between items-center bg-gradient-to-b from-slate-50/90 via-slate-50/50 to-transparent dark:from-slate-900/90 dark:via-slate-900/50 pointer-events-none">
             <button 
               onClick={() => setMode(AppMode.HOME)}
               className="pointer-events-auto bg-white/80 dark:bg-slate-800/80 backdrop-blur text-slate-700 dark:text-white p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700 shadow-sm"
@@ -164,5 +165,3 @@ function App() {
 }
 
 export default App;
-
-
