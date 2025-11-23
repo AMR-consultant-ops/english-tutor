@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { LiveServerMessage, Modality, Type } from '@google/genai';
 import { getGeminiClient } from '../services/geminiService';
 import { createPcmBlob, decodeAudioData, PCM_SAMPLE_RATE } from '../utils/audioUtils';
-import { Visualizer } from './Visualizer.tsx';
+import { Visualizer } from './Visualizer';
 import { playTTS } from '../utils/ttsUtils'; 
 import { PRE_A1_VOCABULARY, A1_VOCABULARY } from '../vocabulary';
 import { useProgress, POINTS } from '../hooks/useProgress';
