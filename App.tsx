@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { LiveTutor } from './components/LiveTutor';
-import { TTSDrill } from './components/TTSDrill';
-import { QuickHelp } from './components/QuickHelp';
-import { ReadingPractice } from './components/ReadingPractice';
-import { VocabularyBuilder } from './components/VocabularyBuilder';
-import { UserProgressCard } from './components/UserProgressCard';
+import { LiveTutor } from './components/LiveTutor.tsx';
+import { TTSDrill } from './components/TTSDrill.tsx';
+import { QuickHelp } from './components/QuickHelp.tsx';
+import { ReadingPractice } from './components/ReadingPractice.tsx';
+import { VocabularyBuilder } from './components/VocabularyBuilder.tsx';
+import { UserProgressCard } from './components/UserProgressCard.tsx';
 import { AppMode } from './types';
 import { POINTS } from './hooks/useProgress';
 
@@ -57,14 +57,14 @@ function App() {
                              <circle cx="100" cy="100" r="90" stroke="#08843f" strokeWidth="12" />
                              <text 
                                 x="100" 
-                                y="125" 
+                                y="130" 
                                 textAnchor="middle" 
-                                fontSize="72" 
+                                fontSize="80" 
                                 fontWeight="900" 
                                 fill="#08843f" 
                                 fontFamily="Nunito, sans-serif"
                              >
-                                 AMR
+                                 ES
                              </text>
                         </svg>
                     </div>
@@ -116,7 +116,7 @@ function App() {
 
              <div className="pt-6 text-center max-w-xs mx-auto opacity-70 hover:opacity-100 transition-opacity">
                <p className="text-[10px] text-slate-400 dark:text-slate-500 leading-tight">
-                 This app is in Beta version and has been developed by <span className="font-bold text-slate-500 dark:text-slate-400">Dr. Anderzon Medina Roa</span> for educational purposes.
+                 AI Tutor Beta Version
                </p>
              </div>
           </div>
