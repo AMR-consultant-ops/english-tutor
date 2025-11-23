@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { LiveTutor } from './components/LiveTutor';
-import { TTSDrill } from './components/TTSDrill';
-import { QuickHelp } from './components/QuickHelp';
-import { ReadingPractice } from './components/ReadingPractice';
-import { VocabularyBuilder } from './components/VocabularyBuilder';
-import { UserProgressCard } from './components/UserProgressCard';
+import { LiveTutor } from './Components/LiveTutor';
+import { TTSDrill } from './Components/TTSDrill';
+import { QuickHelp } from './Components/QuickHelp';
+import { ReadingPractice } from './Components/ReadingPractice';
+import { VocabularyBuilder } from './Components/VocabularyBuilder';
+import { UserProgressCard } from './Components/UserProgressCard';
 import { AppMode } from './types';
 import { POINTS } from './hooks/useProgress';
 
@@ -164,4 +164,5 @@ function App() {
 }
 
 export default App;
+
 
