@@ -53,11 +53,11 @@ export const UserProgressCard: React.FC = () => {
             className={`shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center transition-all duration-1000 ease-out ${isBasicUser ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' : 'bg-gradient-to-r from-brand-400 to-brand-600'}`}
           ></div>
         </div>
-        {/* Improved layout for labels to prevent overlap */}
-        <div className="flex justify-between text-[8px] text-slate-400 font-bold uppercase mt-1">
-           <span className="flex-1 text-left">Novice</span>
-           <span className="flex-1 text-center">Apprentice ({LEVELS.APPRENTICE.min})</span>
-           <span className="flex-1 text-right">Basic ({LEVELS.BASIC_USER.min})</span>
+        {/* Improved layout for labels to prevent overlap using Grid */}
+        <div className="grid grid-cols-3 text-[9px] text-slate-400 font-bold uppercase mt-1 tracking-tighter">
+           <span className="text-left">Novice</span>
+           <span className="text-center">Apprentice</span>
+           <span className="text-right">Basic ({LEVELS.BASIC_USER.min})</span>
         </div>
       </div>
     </div>
