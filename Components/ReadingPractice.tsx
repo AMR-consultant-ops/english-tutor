@@ -275,25 +275,23 @@ export const ReadingPractice: React.FC = () => {
           <p className="text-slate-500 dark:text-slate-400">Lee sobre temas de interés.</p>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Adjusted grid for better responsiveness */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {TOPICS.map((t) => {
             const isDone = isCompleted(t.id);
             return (
               <button
                 key={t.id}
                 onClick={() => fetchStoryOptions(t.id, t.label, t.cefrGoal)}
-                className={`relative border p-6 rounded-2xl flex flex-col items-center gap-3 transition-all group shadow-sm hover:shadow-lg active:scale-95 ${
+                className={`relative border p-6 rounded-2xl flex flex-col items-center gap-3 transition-all group shadow-sm hover:shadow-lg active:scale-95 min-h-[140px] justify-center ${
                   isDone 
                     ? 'bg-brand-50/50 dark:bg-brand-900/10 border-brand-500 dark:border-brand-500/50' 
                     : 'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 hover:border-brand-500'
                 }`}
               >
                 {isDone && (
-                  <div className="absolute top-3 right-3 flex items-center gap-1">
-                    <span className="text-[10px] font-bold text-brand-600 dark:text-brand-400 bg-brand-100 dark:bg-brand-900 px-1.5 py-0.5 rounded-full">+{POINTS.reading} XP</span>
-                    <div className="bg-brand-500 text-white rounded-full p-0.5 shadow-sm">
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-                    </div>
+                  <div className="absolute top-2 right-2 flex items-center gap-1">
+                    <span className="text-[9px] font-bold text-brand-600 dark:text-brand-400 bg-brand-100 dark:bg-brand-900 px-1.5 py-0.5 rounded-full">+{POINTS.reading} XP</span>
                   </div>
                 )}
                 <span className="text-4xl group-hover:scale-110 transition-transform">{t.icon}</span>
@@ -333,7 +331,8 @@ export const ReadingPractice: React.FC = () => {
                     className="w-full text-left bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 border border-slate-200 dark:border-slate-700 hover:border-brand-500/50 p-5 rounded-2xl transition-all shadow-sm hover:shadow-md group active:scale-[0.98]"
                 >
                     <div className="flex justify-between items-start mb-2">
-                        <span className="font-bold text-lg text-brand-700 dark:text-brand-200 group-hover:text-brand-600 dark:group-hover:text-brand-100">{opt.title}</span>
+                        {/* Using text-brand-700 dark:text-brand-200 was too low contrast. Switched to green-700/green-300 */}
+                        <span className="font-bold text-lg text-green-700 dark:text-green-300 group-hover:text-green-600 dark:group-hover:text-green-200">{opt.title}</span>
                         <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider border ${badgeColor}`}>
                             {opt.difficulty}
                         </span>
@@ -351,7 +350,7 @@ export const ReadingPractice: React.FC = () => {
 
   return (
     <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
-      {/* Header - Removed pt-20 */}
+      {/* Header */}
       <div className="p-6 bg-white/80 dark:bg-slate-800/50 backdrop-blur border-b border-slate-200 dark:border-slate-700">
         <div className="flex items-center justify-between mb-4">
            <button onClick={() => setStep('OPTIONS')} className="text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-white text-sm flex items-center gap-1">
@@ -389,7 +388,8 @@ export const ReadingPractice: React.FC = () => {
               {lesson.vocabulary?.length > 0 ? (
                 lesson.vocabulary.map((item, idx) => (
                   <div key={idx} className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex justify-between items-center shadow-sm">
-                    <span className="text-lg font-bold text-brand-700 dark:text-brand-200">{item.word}</span>
+                    {/* Using high contrast green for better visibility in dark mode */}
+                    <span className="text-lg font-bold text-green-700 dark:text-green-300">{item.word}</span>
                     <span className="text-slate-500 dark:text-slate-400 italic">{item.translation}</span>
                   </div>
                 ))
@@ -408,9 +408,9 @@ export const ReadingPractice: React.FC = () => {
 
         {activeTab === 'reading' && (
           <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
-             {/* CRITICAL FIX: Explicit background and text colors to prevent white-on-white */}
              <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
-                <p className="text-lg md:text-xl leading-loose text-slate-900 dark:text-slate-100 font-medium font-serif whitespace-pre-wrap">
+                {/* Explicitly setting text colors to ensure high contrast */}
+                <p className="text-lg md:text-xl leading-loose text-slate-800 dark:text-slate-200 font-medium font-serif whitespace-pre-wrap">
                   {lesson.story}
                 </p>
              </div>
@@ -436,7 +436,7 @@ export const ReadingPractice: React.FC = () => {
                     let btnClass = "w-full text-left p-4 rounded-xl border transition-all ";
                     
                     if (showResults) {
-                      if (isCorrect) btnClass += "bg-brand-100 dark:bg-brand-500/20 border-brand-500 text-brand-800 dark:text-brand-200";
+                      if (isCorrect) btnClass += "bg-green-100 dark:bg-green-500/20 border-green-500 text-green-800 dark:text-green-200";
                       else if (isSelected && !isCorrect) btnClass += "bg-red-100 dark:bg-red-500/20 border-red-500 text-red-800 dark:text-red-200";
                       else btnClass += "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 opacity-50";
                     } else {
