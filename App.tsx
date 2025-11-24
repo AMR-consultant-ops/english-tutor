@@ -119,6 +119,9 @@ function App() {
                <p className="text-[10px] text-slate-400 dark:text-slate-500 leading-tight">
                  AI Tutor Beta Version
                </p>
+               <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 leading-tight">
+                 Developed by Dr. Anderzon Medina Roa <br/> for educational purposes
+               </p>
              </div>
           </div>
         );
@@ -165,3 +168,4 @@ function App() {
 }
 
 export default App;
+
