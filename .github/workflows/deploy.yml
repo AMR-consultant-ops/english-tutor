@@ -25,15 +25,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          # cache removed to avoid error when package-lock.json is missing
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build
         run: npm run build
         env:
-          # This pulls the key you added in Settings -> Secrets -> Actions
           VITE_API_KEY: ${{ secrets.VITE_API_KEY }}
 
       - name: Setup Pages
