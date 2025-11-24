@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { LiveTutor } from './Components/LiveTutor';
-import { TTSDrill } from './Components/TTSDrill';
-import { QuickHelp } from './Components/QuickHelp';
-import { ReadingPractice } from './Components/ReadingPractice';
-import { VocabularyBuilder } from './Components/VocabularyBuilder';
-import { UserProgressCard } from './Components/UserProgressCard';
+import { LiveTutor } from './components/LiveTutor';
+import { TTSDrill } from './components/TTSDrill';
+import { QuickHelp } from './components/QuickHelp';
+import { ReadingPractice } from './components/ReadingPractice';
+import { VocabularyBuilder } from './components/VocabularyBuilder';
+import { UserProgressCard } from './components/UserProgressCard';
 import { AppMode } from './types';
 import { POINTS } from './hooks/useProgress';
 
@@ -31,9 +31,8 @@ function App() {
         return <ReadingPractice />;
       case AppMode.DRILLS:
         return (
-          // Added pt-24 to clear the fixed header
-          <div className="h-full overflow-y-auto pt-24 pb-24 bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
-            <header className="p-6 pb-0">
+          <div className="h-full overflow-y-auto pb-24 bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+            <header className="p-6">
                <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-brand-400 dark:from-brand-400 dark:to-brand-200">
                  Tools & Practice
                </h2>
@@ -117,7 +116,7 @@ function App() {
 
              <div className="pt-6 text-center max-w-xs mx-auto opacity-70 hover:opacity-100 transition-opacity">
                <p className="text-[10px] text-slate-400 dark:text-slate-500 leading-tight">
-                 AI Tutor Beta Version. Developed by Dr. Anderzon Medina Roa for educational purposes
+                 AI Tutor Beta Version. Developed by Dr. Anderzon Medina Roa
                </p>
              </div>
           </div>
@@ -141,23 +140,25 @@ function App() {
           </button>
        </div>
 
+       {/* GLOBAL HEADER - Now Relative / Flex Child */}
        {mode !== AppMode.HOME && (
-         <div className="absolute top-0 left-0 w-full z-40 p-4 flex justify-between items-center bg-gradient-to-b from-slate-50/90 via-slate-50/50 to-transparent dark:from-slate-900/90 dark:via-slate-900/50 pointer-events-none">
+         <header className="flex-shrink-0 w-full z-40 p-4 flex justify-between items-center bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-800 transition-colors duration-300">
             <button 
               onClick={() => setMode(AppMode.HOME)}
-              className="pointer-events-auto bg-white/80 dark:bg-slate-800/80 backdrop-blur text-slate-700 dark:text-white p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700 shadow-sm"
+              className="bg-white dark:bg-slate-800 text-slate-700 dark:text-white p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700 shadow-sm"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
             </button>
-            <div className="bg-brand-100 dark:bg-brand-900/50 backdrop-blur px-3 py-1 rounded-full border border-brand-500/20 mr-12">
+            <div className="bg-brand-100 dark:bg-brand-900/50 px-3 py-1 rounded-full border border-brand-500/20 mr-12">
                <span className="text-xs font-bold text-brand-700 dark:text-brand-300 tracking-wider uppercase">
                   {mode === AppMode.LIVE_TUTOR ? 'Live Class' : mode === AppMode.READING ? 'Reading' : 'Tools'}
                </span>
             </div>
-         </div>
+         </header>
        )}
 
-       <main className="flex-1 h-full relative">
+       {/* MAIN CONTENT - Flex Fill */}
+       <main className="flex-1 overflow-hidden relative flex flex-col">
          {renderContent()}
        </main>
     </div>
@@ -165,4 +166,3 @@ function App() {
 }
 
 export default App;
-
