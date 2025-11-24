@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { LiveServerMessage, Modality, Type } from '@google/genai';
 import { getGeminiClient } from '../services/geminiService';
-import { createPcmBlob, decodeAudioData, PCM_SAMPLE_RATE } from '../utils/audioUtils';
+import { createPcmBlob, decodeAudioData, downsampleTo16k, PCM_SAMPLE_RATE } from '../utils/audioUtils';
 import { Visualizer } from './Visualizer';
 import { playTTS } from '../utils/ttsUtils'; 
 import { PRE_A1_VOCABULARY, A1_VOCABULARY } from '../vocabulary';
@@ -197,7 +197,6 @@ export const LiveTutor: React.FC = () => {
       await playTTS(text, selectedVoice);
     } catch (e) {
       console.error("Audio error", e);
-      // No alert to avoid spamming the user, but we clear loading state in finally
     } finally {
       setAudioPlaying(null);
     }
@@ -233,8 +232,11 @@ export const LiveTutor: React.FC = () => {
       const vocabList = activeTab === 'PRE_A1' ? PRE_A1_VOCABULARY : A1_VOCABULARY;
       const cefrGoal = selectedTopic.cefrGoal;
 
+      // Initialize contexts
+      // NOTE: We do NOT force sampleRate here because browsers may ignore it.
+      // We accept whatever the browser gives us and downsample later.
       const InputContextClass = window.AudioContext || (window as any).webkitAudioContext;
-      inputAudioContextRef.current = new InputContextClass({ sampleRate: PCM_SAMPLE_RATE });
+      inputAudioContextRef.current = new InputContextClass();
       
       const OutputContextClass = window.AudioContext || (window as any).webkitAudioContext;
       outputAudioContextRef.current = new OutputContextClass({ sampleRate: 24000 });
@@ -242,7 +244,13 @@ export const LiveTutor: React.FC = () => {
       await inputAudioContextRef.current.resume();
       await outputAudioContextRef.current.resume();
       
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        } 
+      });
       mediaStreamRef.current = stream;
 
       setConnected(true);
@@ -250,7 +258,6 @@ export const LiveTutor: React.FC = () => {
       setTranscript([]); 
 
       const selectedVoice = voiceGender === 'male' ? 'Puck' : 'Kore';
-
       const scenarioVocabString = scenario.vocabulary 
         ? scenario.vocabulary.map(v => v.word).join(', ') 
         : '';
@@ -281,19 +288,38 @@ export const LiveTutor: React.FC = () => {
             setIsConnecting(false);
             
             if (!inputAudioContextRef.current) return;
-            sourceRef.current = inputAudioContextRef.current.createMediaStreamSource(stream);
-            processorRef.current = inputAudioContextRef.current.createScriptProcessor(4096, 1, 1);
+            const ctx = inputAudioContextRef.current;
+            const source = ctx.createMediaStreamSource(stream);
+            const processor = ctx.createScriptProcessor(4096, 1, 1);
             
-            processorRef.current.onaudioprocess = (e) => {
+            sourceRef.current = source;
+            processorRef.current = processor;
+            
+            processor.onaudioprocess = (e) => {
               const inputData = e.inputBuffer.getChannelData(0);
-              const pcmBlob = createPcmBlob(inputData);
+              
+              // CRITICAL: Visual feedback for mic input
+              let sum = 0;
+              for(let i=0; i<inputData.length; i++) sum += inputData[i] * inputData[i];
+              const rms = Math.sqrt(sum / inputData.length);
+              // If we detect sound (and we aren't currently playing AI audio), update visualizer
+              if (rms > 0.01 && sourcesRef.current.size === 0) {
+                 // We can use a ref or state setter here, but debounced ideally.
+                 // For now relying on state might be too frequent, but Vis component handles animation.
+                 // We just want to ensure we know it's "listening".
+              }
+
+              // CRITICAL: Downsample to 16000Hz before sending to Gemini
+              const downsampledData = downsampleTo16k(inputData, ctx.sampleRate);
+              const pcmBlob = createPcmBlob(downsampledData);
+              
               sessionPromise.then(session => {
                 session.sendRealtimeInput({ media: pcmBlob });
               });
             };
             
-            sourceRef.current.connect(processorRef.current);
-            processorRef.current.connect(inputAudioContextRef.current.destination);
+            source.connect(processor);
+            processor.connect(ctx.destination);
           },
           onmessage: async (msg: LiveServerMessage) => {
             const outputCtx = outputAudioContextRef.current;
@@ -374,7 +400,7 @@ export const LiveTutor: React.FC = () => {
       
       sessionPromise.catch(err => {
         console.error("Connection Failed", err);
-        setError("No se pudo conectar con el tutor.");
+        setError("No se pudo conectar con el tutor. (Permisos de micro?)");
         stopSession();
       });
 
@@ -418,7 +444,7 @@ export const LiveTutor: React.FC = () => {
     <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white relative transition-colors duration-300">
       
       {/* --- HEADER (DYNAMIC) --- */}
-      <div className={`flex-shrink-0 flex flex-col items-center justify-center p-6 transition-all duration-500 ${connected ? 'h-56 bg-white/50 dark:bg-slate-800/50' : 'h-auto min-h-[15vh]'}`}>
+      <div className={`flex-shrink-0 flex flex-col items-center justify-center p-6 transition-all duration-500 ${connected ? 'h-48 bg-white/50 dark:bg-slate-800/50' : 'h-auto min-h-[10vh]'}`}>
         {error && (
           <div className="bg-red-500/10 border border-red-500 text-red-600 dark:text-red-200 px-4 py-2 rounded-lg max-w-sm text-center mb-4 text-sm">
             {error}
