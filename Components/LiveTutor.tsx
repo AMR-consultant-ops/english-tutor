@@ -402,29 +402,31 @@ export const LiveTutor: React.FC = () => {
   const currentTopics = activeTab === 'PRE_A1' ? PRE_A1_TOPICS : A1_TOPICS;
 
   // --- RENDER LOADING ---
-  if (isLoadingScenarios) {
-    return (
-        <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900 items-center justify-center p-6 space-y-6 transition-colors duration-300">
-            <div className="w-16 h-16 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
-            <div className="text-center">
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Diseñando clase...</h3>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">Creando situaciones para {selectedTopic?.label}</p>
-            </div>
-        </div>
-    )
-  }
-
+if (isLoadingScenarios) {
   return (
-    <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white relative transition-colors duration-300">
+    <div className="h-full w-full flex items-center justify-center bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+      <div className="text-center">
+        <div className="animate-spin text-5xl mb-4">⚙️</div>
+        <h2 className="h2 mb-2">Diseñando clase...</h2>
+        <p className="body-sm text-slate-500 dark:text-slate-400">
+          Creando situaciones para {selectedTopic?.label}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+return (
+    <div className="h-full w-full flex flex-col overflow-hidden bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white transition-colors duration-300">
       
       {/* --- HEADER (DYNAMIC) --- */}
-      {/* Added pt-20 to clear the global App header */}
-      <div className={`flex-shrink-0 flex flex-col items-center justify-center p-6 pt-20 transition-all duration-500 ${connected ? 'h-56 bg-white/50 dark:bg-slate-800/50' : 'h-auto min-h-[15vh]'}`}>
+      <div className={`flex-shrink-0 flex flex-col items-center justify-center container-max py-6 sm:py-8 transition-all duration-500 ${connected ? 'h-56 bg-white/50 dark:bg-slate-800/50' : 'h-auto min-h-[15vh]'}`}>
         {error && (
-          <div className="bg-red-500/10 border border-red-500 text-red-600 dark:text-red-200 px-4 py-2 rounded-lg max-w-sm text-center mb-4 text-sm">
+          <div className="bg-red-500/10 border border-red-500 text-red-600 dark:text-red-200 px-4 py-2 rounded-lg max-w-sm text-center mb-4 text-sm focus-ring">
             {error}
           </div>
         )}
+
         
         {connected ? (
           <>
@@ -454,7 +456,7 @@ export const LiveTutor: React.FC = () => {
              
              {step === 'MENU' && (
                <>
-                 <h2 className="text-2xl font-bold tracking-tight">Configura tu Clase</h2>
+                 <h2 className="h2 text-center mb-4">Configura tu Clase</h2>
                  <p className="text-slate-500 dark:text-slate-400 text-sm">Personaliza tu experiencia.</p>
                </>
              )}
@@ -495,22 +497,22 @@ export const LiveTutor: React.FC = () => {
                                 <div className="flex gap-2">
                                     <button 
                                         onClick={() => setVoiceGender('male')}
-                                        className={`flex-1 py-3 px-2 rounded-xl text-xs font-bold transition-all border ${
+                                        className={`flex-1 btn-base text-xs sm:text-sm ${
                                             voiceGender === 'male' 
-                                            ? 'bg-brand-50 dark:bg-brand-900/30 border-brand-500 text-brand-700 dark:text-brand-300 shadow-sm'
-                                            : 'bg-slate-50 dark:bg-slate-700/50 border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100'
+                                            ? 'btn-active' : 'btn-inactive'
                                         }`}
-                                    >
+                                        aria-current={voiceGender === 'male'}
+                                      >
                                         👨 Male
                                     </button>
                                     <button 
                                         onClick={() => setVoiceGender('female')}
-                                        className={`flex-1 py-3 px-2 rounded-xl text-xs font-bold transition-all border ${
+                                        className={`flex-1 btn-base text-xs sm:text-sm ${
                                             voiceGender === 'female' 
-                                            ? 'bg-brand-50 dark:bg-brand-900/30 border-brand-500 text-brand-700 dark:text-brand-300 shadow-sm'
-                                            : 'bg-slate-50 dark:bg-slate-700/50 border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100'
-                                        }`}
-                                    >
+                                            ? 'btn-active' : 'btn-inactive'
+                                            }`}
+                                        aria-current={voiceGender === 'female'}
+                                      >
                                         👩 Female
                                     </button>
                                 </div>
@@ -520,20 +522,18 @@ export const LiveTutor: React.FC = () => {
                                 <div className="flex gap-2">
                                     <button 
                                         onClick={() => setVoiceAccent('US')}
-                                        className={`flex-1 py-3 px-2 rounded-xl text-xs font-bold transition-all border ${
+                                        className={`flex-1 btn-base text-xs sm:text-sm ${
                                             voiceAccent === 'US' 
-                                            ? 'bg-brand-50 dark:bg-brand-900/30 border-brand-500 text-brand-700 dark:text-brand-300 shadow-sm'
-                                            : 'bg-slate-50 dark:bg-slate-700/50 border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100'
+                                            ? 'btn-active' : 'btn-inactive'
                                         }`}
                                     >
                                         🇺🇸 USA
                                     </button>
                                     <button 
                                         onClick={() => setVoiceAccent('UK')}
-                                        className={`flex-1 py-3 px-2 rounded-xl text-xs font-bold transition-all border ${
+                                        className={`flex-1 btn-base text-xs sm:text-sm ${
                                             voiceAccent === 'UK' 
-                                            ? 'bg-brand-50 dark:bg-brand-900/30 border-brand-500 text-brand-700 dark:text-brand-300 shadow-sm'
-                                            : 'bg-slate-50 dark:bg-slate-700/50 border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100'
+                                            ? 'btn-active' : 'btn-inactive'
                                         }`}
                                     >
                                         🇬🇧 UK
