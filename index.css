@@ -90,7 +90,7 @@
 
 .card-interactive {
   @apply card hover:border-blue-400 dark:hover:border-blue-600
-         active:scale-98 cursor-pointer;
+         active:scale-[0.98] cursor-pointer;
 }
 
 /* Container Constraints */
@@ -167,3 +167,4 @@ html {
     color-scheme: dark;
   }
 }
+
