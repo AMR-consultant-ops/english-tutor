@@ -43,12 +43,37 @@ export async function decodeAudioData(
   return buffer;
 }
 
+/**
+ * Downsamples audio data from the source rate to the target rate (16kHz).
+ * Simple linear interpolation.
+ */
+export function downsampleTo16k(inputData: Float32Array, inputSampleRate: number): Float32Array {
+  if (inputSampleRate === PCM_SAMPLE_RATE) {
+    return inputData;
+  }
+
+  const ratio = inputSampleRate / PCM_SAMPLE_RATE;
+  const newLength = Math.ceil(inputData.length / ratio);
+  const result = new Float32Array(newLength);
+  
+  for (let i = 0; i < newLength; i++) {
+    const originalIndex = i * ratio;
+    const index1 = Math.floor(originalIndex);
+    const index2 = Math.min(Math.ceil(originalIndex), inputData.length - 1);
+    const weight = originalIndex - index1;
+    
+    // Linear interpolation
+    result[i] = inputData[index1] * (1 - weight) + inputData[index2] * weight;
+  }
+  
+  return result;
+}
+
 export function createPcmBlob(data: Float32Array): { data: string; mimeType: string } {
-  // Downsample or process if necessary, but assuming input is already at target rate from context or processor
   const l = data.length;
   const int16 = new Int16Array(l);
   for (let i = 0; i < l; i++) {
-    // Clamp values
+    // Clamp values [-1.0, 1.0] and convert to Int16 PCM
     let s = Math.max(-1, Math.min(1, data[i]));
     int16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
   }
