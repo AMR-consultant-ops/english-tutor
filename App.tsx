@@ -117,7 +117,7 @@ function App() {
 
              <div className="pt-6 text-center max-w-xs mx-auto opacity-70 hover:opacity-100 transition-opacity">
                <p className="text-[10px] text-slate-400 dark:text-slate-500 leading-tight">
-                 AI Tutor Beta Version
+                 AI Tutor Beta Version. Developed by Dr. Anderzon Medina Roa for educational purposes
                </p>
              </div>
           </div>
@@ -165,3 +165,4 @@ function App() {
 }
 
 export default App;
+
