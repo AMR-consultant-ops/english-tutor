@@ -418,8 +418,7 @@ export const LiveTutor: React.FC = () => {
     <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white relative transition-colors duration-300">
       
       {/* --- HEADER (DYNAMIC) --- */}
-      {/* Added pt-20 to clear the global App header */}
-      <div className={`flex-shrink-0 flex flex-col items-center justify-center p-6 pt-20 transition-all duration-500 ${connected ? 'h-56 bg-white/50 dark:bg-slate-800/50' : 'h-auto min-h-[15vh]'}`}>
+      <div className={`flex-shrink-0 flex flex-col items-center justify-center p-6 transition-all duration-500 ${connected ? 'h-56 bg-white/50 dark:bg-slate-800/50' : 'h-auto min-h-[15vh]'}`}>
         {error && (
           <div className="bg-red-500/10 border border-red-500 text-red-600 dark:text-red-200 px-4 py-2 rounded-lg max-w-sm text-center mb-4 text-sm">
             {error}
@@ -497,8 +496,8 @@ export const LiveTutor: React.FC = () => {
                                         onClick={() => setVoiceGender('male')}
                                         className={`flex-1 py-3 px-2 rounded-xl text-xs font-bold transition-all border ${
                                             voiceGender === 'male' 
-                                            ? 'bg-brand-50 dark:bg-brand-900/30 border-brand-500 text-brand-700 dark:text-brand-300 shadow-sm'
-                                            : 'bg-slate-50 dark:bg-slate-700/50 border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100'
+                                            ? 'bg-brand-600 text-white border-brand-500 shadow-lg scale-105'
+                                            : 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 hover:bg-slate-50'
                                         }`}
                                     >
                                         👨 Male
@@ -507,8 +506,8 @@ export const LiveTutor: React.FC = () => {
                                         onClick={() => setVoiceGender('female')}
                                         className={`flex-1 py-3 px-2 rounded-xl text-xs font-bold transition-all border ${
                                             voiceGender === 'female' 
-                                            ? 'bg-brand-50 dark:bg-brand-900/30 border-brand-500 text-brand-700 dark:text-brand-300 shadow-sm'
-                                            : 'bg-slate-50 dark:bg-slate-700/50 border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100'
+                                            ? 'bg-brand-600 text-white border-brand-500 shadow-lg scale-105'
+                                            : 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 hover:bg-slate-50'
                                         }`}
                                     >
                                         👩 Female
@@ -522,8 +521,8 @@ export const LiveTutor: React.FC = () => {
                                         onClick={() => setVoiceAccent('US')}
                                         className={`flex-1 py-3 px-2 rounded-xl text-xs font-bold transition-all border ${
                                             voiceAccent === 'US' 
-                                            ? 'bg-brand-50 dark:bg-brand-900/30 border-brand-500 text-brand-700 dark:text-brand-300 shadow-sm'
-                                            : 'bg-slate-50 dark:bg-slate-700/50 border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100'
+                                            ? 'bg-brand-600 text-white border-brand-500 shadow-lg scale-105'
+                                            : 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 hover:bg-slate-50'
                                         }`}
                                     >
                                         🇺🇸 USA
@@ -532,8 +531,8 @@ export const LiveTutor: React.FC = () => {
                                         onClick={() => setVoiceAccent('UK')}
                                         className={`flex-1 py-3 px-2 rounded-xl text-xs font-bold transition-all border ${
                                             voiceAccent === 'UK' 
-                                            ? 'bg-brand-50 dark:bg-brand-900/30 border-brand-500 text-brand-700 dark:text-brand-300 shadow-sm'
-                                            : 'bg-slate-50 dark:bg-slate-700/50 border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100'
+                                            ? 'bg-brand-600 text-white border-brand-500 shadow-lg scale-105'
+                                            : 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 hover:bg-slate-50'
                                         }`}
                                     >
                                         🇬🇧 UK
@@ -554,8 +553,8 @@ export const LiveTutor: React.FC = () => {
                             onClick={() => setActiveTab('PRE_A1')}
                             className={`flex-1 py-3 px-2 rounded-xl text-sm font-bold transition-all duration-200 border ${
                                 activeTab === 'PRE_A1'
-                                ? 'bg-brand-50 dark:bg-brand-900/30 border-brand-500 text-brand-700 dark:text-brand-300 shadow-sm'
-                                : 'bg-slate-50 dark:bg-slate-700/50 border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
+                                ? 'bg-brand-600 text-white border-brand-500 shadow-lg scale-105'
+                                : 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 hover:bg-slate-50'
                             }`}
                             >
                             Principiante
@@ -564,8 +563,8 @@ export const LiveTutor: React.FC = () => {
                             onClick={() => setActiveTab('A1')}
                             className={`flex-1 py-3 px-2 rounded-xl text-sm font-bold transition-all duration-200 border ${
                                 activeTab === 'A1'
-                                ? 'bg-brand-50 dark:bg-brand-900/30 border-brand-500 text-brand-700 dark:text-brand-300 shadow-sm'
-                                : 'bg-slate-50 dark:bg-slate-700/50 border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
+                                ? 'bg-brand-600 text-white border-brand-500 shadow-lg scale-105'
+                                : 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 hover:bg-slate-50'
                             }`}
                             >
                             Básico
