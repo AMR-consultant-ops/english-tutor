@@ -269,14 +269,12 @@ export const ReadingPractice: React.FC = () => {
   // --- RENDER STEP 1: TOPICS ---
   if (step === 'TOPICS') {
     return (
-      // Added pt-24 to clear global header
-      <div className="p-6 pt-24 space-y-6 h-full overflow-y-auto pb-32 bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+      <div className="p-6 space-y-6 h-full overflow-y-auto pb-32 bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
         <div className="text-center space-y-2 mb-4">
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Práctica de Lectura</h2>
           <p className="text-slate-500 dark:text-slate-400">Lee sobre temas de interés.</p>
         </div>
         
-        {/* Changed grid-cols-2 to sm:grid-cols-2 to fix squashed items on narrow screens */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {TOPICS.map((t) => {
             const isDone = isCompleted(t.id);
@@ -311,7 +309,7 @@ export const ReadingPractice: React.FC = () => {
   // --- RENDER STEP 2: STORY OPTIONS ---
   if (step === 'OPTIONS') {
     return (
-      <div className="p-6 pt-24 h-full overflow-y-auto bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+      <div className="p-6 h-full overflow-y-auto bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
         <div className="flex items-center gap-4 mb-6">
             <button onClick={resetToTopics} className="p-2 bg-white dark:bg-slate-800 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-300 border border-slate-200 dark:border-transparent">
                 ←
@@ -353,9 +351,8 @@ export const ReadingPractice: React.FC = () => {
 
   return (
     <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
-      {/* Header */}
-      {/* Added pt-20 to clear fixed header */}
-      <div className="p-6 pt-24 bg-white/80 dark:bg-slate-800/50 backdrop-blur border-b border-slate-200 dark:border-slate-700">
+      {/* Header - Removed pt-20 */}
+      <div className="p-6 bg-white/80 dark:bg-slate-800/50 backdrop-blur border-b border-slate-200 dark:border-slate-700">
         <div className="flex items-center justify-between mb-4">
            <button onClick={() => setStep('OPTIONS')} className="text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-white text-sm flex items-center gap-1">
              ← Atrás
@@ -411,8 +408,9 @@ export const ReadingPractice: React.FC = () => {
 
         {activeTab === 'reading' && (
           <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
-             <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700/50">
-                <p className="text-lg md:text-xl leading-loose text-slate-800 dark:text-slate-200 font-medium font-serif whitespace-pre-wrap">
+             {/* CRITICAL FIX: Explicit background and text colors to prevent white-on-white */}
+             <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
+                <p className="text-lg md:text-xl leading-loose text-slate-900 dark:text-slate-100 font-medium font-serif whitespace-pre-wrap">
                   {lesson.story}
                 </p>
              </div>
