@@ -4,10 +4,11 @@ import react from '@vitejs/plugin-react';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: Ensglish Start
+  base: English Start
   build: {
     outDir: 'dist',
     sourcemap: false
   }
 
 });
+
