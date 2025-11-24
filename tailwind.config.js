@@ -2,8 +2,9 @@
 export default {
   content: [
     "./index.html",
-    "./*.{js,ts,jsx,tsx}",
-    "./components/**/*.{js,ts,jsx,tsx}"
+    "./App.tsx",
+    "./Components/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
   ],
   darkMode: 'class',
   theme: {
@@ -28,7 +29,7 @@ export default {
           50: '#f4f6f8',
           100: '#e3e7eb',
           200: '#c5ccd3',
-          300: '#c0c0c0', 
+          300: '#c0c0c0',
           400: '#aaaaaa',
           500: '#888888',
           600: '#5c6f82',
@@ -36,7 +37,26 @@ export default {
           800: '#2a3a4a',
           900: '#1d2b3b',
           950: '#0f1720',
-        }
+        },
+      },
+      spacing: {
+        'safe-top': 'var(--safe-area-inset-top)',
+        'safe-bottom': 'var(--safe-area-inset-bottom)',
+      },
+      borderRadius: {
+        'xl': '1rem',
+        '2xl': '1.5rem',
+      },
+      boxShadow: {
+        'sm': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+        'md': '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+        'lg': '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+      },
+      opacity: {
+        '5': '0.05',
+        '10': '0.1',
+        '70': '0.7',
+        '75': '0.75',
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
