@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { LiveServerMessage, Modality, Type } from '@google/genai';
 import { getGeminiClient } from '../services/geminiService';
-import { createPcmBlob, decodeAudioData, downsampleTo16k, PCM_SAMPLE_RATE } from '../utils/audioUtils';
+import { createPcmBlob, decodeAudioData, PCM_SAMPLE_RATE } from '../utils/audioUtils';
 import { Visualizer } from './Visualizer';
 import { playTTS } from '../utils/ttsUtils'; 
 import { PRE_A1_VOCABULARY, A1_VOCABULARY } from '../vocabulary';
@@ -197,6 +197,7 @@ export const LiveTutor: React.FC = () => {
       await playTTS(text, selectedVoice);
     } catch (e) {
       console.error("Audio error", e);
+      // No alert to avoid spamming the user, but we clear loading state in finally
     } finally {
       setAudioPlaying(null);
     }
@@ -232,11 +233,8 @@ export const LiveTutor: React.FC = () => {
       const vocabList = activeTab === 'PRE_A1' ? PRE_A1_VOCABULARY : A1_VOCABULARY;
       const cefrGoal = selectedTopic.cefrGoal;
 
-      // Initialize contexts
-      // NOTE: We do NOT force sampleRate here because browsers may ignore it.
-      // We accept whatever the browser gives us and downsample later.
       const InputContextClass = window.AudioContext || (window as any).webkitAudioContext;
-      inputAudioContextRef.current = new InputContextClass();
+      inputAudioContextRef.current = new InputContextClass({ sampleRate: PCM_SAMPLE_RATE });
       
       const OutputContextClass = window.AudioContext || (window as any).webkitAudioContext;
       outputAudioContextRef.current = new OutputContextClass({ sampleRate: 24000 });
@@ -244,13 +242,7 @@ export const LiveTutor: React.FC = () => {
       await inputAudioContextRef.current.resume();
       await outputAudioContextRef.current.resume();
       
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true
-        } 
-      });
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaStreamRef.current = stream;
 
       setConnected(true);
@@ -258,6 +250,7 @@ export const LiveTutor: React.FC = () => {
       setTranscript([]); 
 
       const selectedVoice = voiceGender === 'male' ? 'Puck' : 'Kore';
+
       const scenarioVocabString = scenario.vocabulary 
         ? scenario.vocabulary.map(v => v.word).join(', ') 
         : '';
@@ -288,38 +281,19 @@ export const LiveTutor: React.FC = () => {
             setIsConnecting(false);
             
             if (!inputAudioContextRef.current) return;
-            const ctx = inputAudioContextRef.current;
-            const source = ctx.createMediaStreamSource(stream);
-            const processor = ctx.createScriptProcessor(4096, 1, 1);
+            sourceRef.current = inputAudioContextRef.current.createMediaStreamSource(stream);
+            processorRef.current = inputAudioContextRef.current.createScriptProcessor(4096, 1, 1);
             
-            sourceRef.current = source;
-            processorRef.current = processor;
-            
-            processor.onaudioprocess = (e) => {
+            processorRef.current.onaudioprocess = (e) => {
               const inputData = e.inputBuffer.getChannelData(0);
-              
-              // CRITICAL: Visual feedback for mic input
-              let sum = 0;
-              for(let i=0; i<inputData.length; i++) sum += inputData[i] * inputData[i];
-              const rms = Math.sqrt(sum / inputData.length);
-              // If we detect sound (and we aren't currently playing AI audio), update visualizer
-              if (rms > 0.01 && sourcesRef.current.size === 0) {
-                 // We can use a ref or state setter here, but debounced ideally.
-                 // For now relying on state might be too frequent, but Vis component handles animation.
-                 // We just want to ensure we know it's "listening".
-              }
-
-              // CRITICAL: Downsample to 16000Hz before sending to Gemini
-              const downsampledData = downsampleTo16k(inputData, ctx.sampleRate);
-              const pcmBlob = createPcmBlob(downsampledData);
-              
+              const pcmBlob = createPcmBlob(inputData);
               sessionPromise.then(session => {
                 session.sendRealtimeInput({ media: pcmBlob });
               });
             };
             
-            source.connect(processor);
-            processor.connect(ctx.destination);
+            sourceRef.current.connect(processorRef.current);
+            processorRef.current.connect(inputAudioContextRef.current.destination);
           },
           onmessage: async (msg: LiveServerMessage) => {
             const outputCtx = outputAudioContextRef.current;
@@ -400,7 +374,7 @@ export const LiveTutor: React.FC = () => {
       
       sessionPromise.catch(err => {
         console.error("Connection Failed", err);
-        setError("No se pudo conectar con el tutor. (Permisos de micro?)");
+        setError("No se pudo conectar con el tutor.");
         stopSession();
       });
 
@@ -431,7 +405,7 @@ export const LiveTutor: React.FC = () => {
   if (isLoadingScenarios) {
     return (
         <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900 items-center justify-center p-6 space-y-6 transition-colors duration-300">
-            <div className="w-16 h-16 border-4 border-brand-500 dark:border-brand-400 border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-16 h-16 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
             <div className="text-center">
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white">Diseñando clase...</h3>
                 <p className="text-slate-500 dark:text-slate-400 text-sm">Creando situaciones para {selectedTopic?.label}</p>
@@ -444,7 +418,8 @@ export const LiveTutor: React.FC = () => {
     <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white relative transition-colors duration-300">
       
       {/* --- HEADER (DYNAMIC) --- */}
-      <div className={`flex-shrink-0 flex flex-col items-center justify-center p-6 transition-all duration-500 backdrop-blur-md ${connected ? 'h-48 bg-white/80 dark:bg-slate-900/80 sticky top-0 z-30' : 'h-auto min-h-[10vh]'}`}>
+      {/* Added pt-20 to clear the global App header */}
+      <div className={`flex-shrink-0 flex flex-col items-center justify-center p-6 pt-20 transition-all duration-500 ${connected ? 'h-56 bg-white/50 dark:bg-slate-800/50' : 'h-auto min-h-[15vh]'}`}>
         {error && (
           <div className="bg-red-500/10 border border-red-500 text-red-600 dark:text-red-200 px-4 py-2 rounded-lg max-w-sm text-center mb-4 text-sm">
             {error}
@@ -509,7 +484,7 @@ export const LiveTutor: React.FC = () => {
                   <div className="space-y-6">
                     
                     {/* SECTION 1: TUTOR CONFIG */}
-                    <div className="bg-white dark:bg-slate-800/50 p-5 rounded-2xl border border-slate-200 dark:border-slate-600 shadow-sm">
+                    <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
                         <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
                             <span className="w-5 h-5 bg-brand-100 dark:bg-brand-900 text-brand-600 dark:text-brand-400 rounded-full flex items-center justify-center text-[10px] border border-brand-200 dark:border-brand-700">1</span>
                             Personaliza tu Tutor
@@ -522,8 +497,8 @@ export const LiveTutor: React.FC = () => {
                                         onClick={() => setVoiceGender('male')}
                                         className={`flex-1 py-3 px-2 rounded-xl text-xs font-bold transition-all border ${
                                             voiceGender === 'male' 
-                                            ? 'bg-brand-600 text-white border-brand-500 shadow-lg scale-105'
-                                            : 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 hover:bg-slate-50'
+                                            ? 'bg-brand-50 dark:bg-brand-900/30 border-brand-500 text-brand-700 dark:text-brand-300 shadow-sm'
+                                            : 'bg-slate-50 dark:bg-slate-700/50 border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100'
                                         }`}
                                     >
                                         👨 Male
@@ -532,8 +507,8 @@ export const LiveTutor: React.FC = () => {
                                         onClick={() => setVoiceGender('female')}
                                         className={`flex-1 py-3 px-2 rounded-xl text-xs font-bold transition-all border ${
                                             voiceGender === 'female' 
-                                            ? 'bg-brand-600 text-white border-brand-500 shadow-lg scale-105'
-                                            : 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 hover:bg-slate-50'
+                                            ? 'bg-brand-50 dark:bg-brand-900/30 border-brand-500 text-brand-700 dark:text-brand-300 shadow-sm'
+                                            : 'bg-slate-50 dark:bg-slate-700/50 border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100'
                                         }`}
                                     >
                                         👩 Female
@@ -547,8 +522,8 @@ export const LiveTutor: React.FC = () => {
                                         onClick={() => setVoiceAccent('US')}
                                         className={`flex-1 py-3 px-2 rounded-xl text-xs font-bold transition-all border ${
                                             voiceAccent === 'US' 
-                                            ? 'bg-brand-600 text-white border-brand-500 shadow-lg scale-105'
-                                            : 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 hover:bg-slate-50'
+                                            ? 'bg-brand-50 dark:bg-brand-900/30 border-brand-500 text-brand-700 dark:text-brand-300 shadow-sm'
+                                            : 'bg-slate-50 dark:bg-slate-700/50 border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100'
                                         }`}
                                     >
                                         🇺🇸 USA
@@ -557,8 +532,8 @@ export const LiveTutor: React.FC = () => {
                                         onClick={() => setVoiceAccent('UK')}
                                         className={`flex-1 py-3 px-2 rounded-xl text-xs font-bold transition-all border ${
                                             voiceAccent === 'UK' 
-                                            ? 'bg-brand-600 text-white border-brand-500 shadow-lg scale-105'
-                                            : 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 hover:bg-slate-50'
+                                            ? 'bg-brand-50 dark:bg-brand-900/30 border-brand-500 text-brand-700 dark:text-brand-300 shadow-sm'
+                                            : 'bg-slate-50 dark:bg-slate-700/50 border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100'
                                         }`}
                                     >
                                         🇬🇧 UK
@@ -569,7 +544,7 @@ export const LiveTutor: React.FC = () => {
                     </div>
 
                     {/* SECTION 2: LEVEL SELECTION */}
-                    <div className="bg-white dark:bg-slate-800/50 p-5 rounded-2xl border border-slate-200 dark:border-slate-600 shadow-sm">
+                    <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
                         <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
                             <span className="w-5 h-5 bg-brand-100 dark:bg-brand-900 text-brand-600 dark:text-brand-400 rounded-full flex items-center justify-center text-[10px] border border-brand-200 dark:border-brand-700">2</span>
                             Elige tu Nivel
@@ -579,8 +554,8 @@ export const LiveTutor: React.FC = () => {
                             onClick={() => setActiveTab('PRE_A1')}
                             className={`flex-1 py-3 px-2 rounded-xl text-sm font-bold transition-all duration-200 border ${
                                 activeTab === 'PRE_A1'
-                                ? 'bg-brand-600 text-white border-brand-500 shadow-lg scale-105'
-                                : 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 hover:bg-slate-50'
+                                ? 'bg-brand-50 dark:bg-brand-900/30 border-brand-500 text-brand-700 dark:text-brand-300 shadow-sm'
+                                : 'bg-slate-50 dark:bg-slate-700/50 border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
                             }`}
                             >
                             Principiante
@@ -589,8 +564,8 @@ export const LiveTutor: React.FC = () => {
                             onClick={() => setActiveTab('A1')}
                             className={`flex-1 py-3 px-2 rounded-xl text-sm font-bold transition-all duration-200 border ${
                                 activeTab === 'A1'
-                                ? 'bg-brand-600 text-white border-brand-500 shadow-lg scale-105'
-                                : 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 hover:bg-slate-50'
+                                ? 'bg-brand-50 dark:bg-brand-900/30 border-brand-500 text-brand-700 dark:text-brand-300 shadow-sm'
+                                : 'bg-slate-50 dark:bg-slate-700/50 border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
                             }`}
                             >
                             Básico
@@ -611,10 +586,10 @@ export const LiveTutor: React.FC = () => {
                                 <div key={topic.id} className="relative group">
                                   <button
                                       onClick={() => fetchScenarios(topic)}
-                                      className={`w-full bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 border p-4 rounded-2xl flex flex-col items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md active:scale-95 min-h-[110px] ${
+                                      className={`w-full bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border p-4 rounded-2xl flex flex-col items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md active:scale-95 min-h-[110px] ${
                                         isDone 
                                           ? 'border-brand-500 dark:border-brand-500/50 bg-brand-50/50 dark:bg-brand-900/10' 
-                                          : 'border-slate-200 dark:border-slate-600 hover:border-brand-500/50'
+                                          : 'border-slate-200 dark:border-slate-700 hover:border-brand-500/50'
                                       }`}
                                   >
                                       <span className="text-3xl group-hover:scale-110 transition-transform duration-300">{topic.icon}</span>
@@ -658,7 +633,7 @@ export const LiveTutor: React.FC = () => {
                             key={idx}
                             onClick={() => handleScenarioSelect(scen)}
                             disabled={isConnecting}
-                            className="w-full text-left bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 border border-slate-200 dark:border-slate-600 hover:border-brand-500 p-5 rounded-2xl transition-all shadow-sm hover:shadow-md group active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full text-left bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 border border-slate-200 dark:border-slate-700 hover:border-brand-500 p-5 rounded-2xl transition-all shadow-sm hover:shadow-md group active:scale-[0.98]"
                           >
                              <div className="flex justify-between items-center mb-2">
                                  <span className="font-bold text-lg text-brand-700 dark:text-brand-200 group-hover:text-brand-600 dark:group-hover:text-brand-100">{scen.title}</span>
@@ -685,8 +660,7 @@ export const LiveTutor: React.FC = () => {
                               <button
                                 key={idx}
                                 onClick={() => playWordAudio(item.word)}
-                                disabled={!!audioPlaying}
-                                className="flex items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-brand-400 dark:hover:border-brand-600 transition-colors shadow-sm active:scale-[0.99] disabled:opacity-70 disabled:cursor-wait"
+                                className="flex items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-brand-400 dark:hover:border-brand-600 transition-colors shadow-sm active:scale-[0.99]"
                               >
                                   <div className="text-left">
                                       <span className="block font-bold text-slate-800 dark:text-white text-lg">{item.word}</span>
@@ -707,7 +681,7 @@ export const LiveTutor: React.FC = () => {
                           <button
                             onClick={startSession}
                             disabled={isConnecting}
-                            className="w-full bg-brand-600 hover:bg-brand-500 text-white p-5 rounded-2xl font-bold text-xl shadow-lg shadow-brand-500/30 flex items-center justify-center gap-3 transition-transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                            className="w-full bg-brand-600 hover:bg-brand-500 text-white p-5 rounded-2xl font-bold text-xl shadow-lg shadow-brand-500/30 flex items-center justify-center gap-3 transition-transform active:scale-95"
                           >
                              {isConnecting ? (
                                <>
@@ -729,7 +703,7 @@ export const LiveTutor: React.FC = () => {
           /* VIEW 4: LIVE TRANSCRIPT */
           <div 
             ref={transcriptContainerRef}
-            className="h-full overflow-y-auto px-4 py-4 space-y-4 mask-image-gradient pb-32"
+            className="h-full overflow-y-auto px-4 py-4 space-y-4 mask-image-gradient"
           >
             {transcript.length === 0 && (
               <div className="text-center text-slate-500 text-sm mt-10 italic">
@@ -738,32 +712,32 @@ export const LiveTutor: React.FC = () => {
             )}
             {transcript.map((msg) => (
                 <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[85%] rounded-2xl px-5 py-3 text-sm leading-relaxed shadow-sm ${
+                    <div className={`max-w-[85%] rounded-2xl px-5 py-3 text-sm leading-relaxed shadow-md ${
                         msg.role === 'user' 
-                        ? 'bg-brand-600 text-white rounded-tr-none shadow-md' 
-                        : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 border-2 border-slate-100 dark:border-slate-700 rounded-tl-none'
+                        ? 'bg-brand-600 text-white rounded-tr-none' 
+                        : 'bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-transparent rounded-tl-none'
                     }`}>
                         {msg.text}
                     </div>
                 </div>
             ))}
-            <div ref={transcriptEndRef} className="h-8" />
+            <div ref={transcriptEndRef} className="h-24" />
           </div>
         )}
-      </div>
 
-      {/* Floating Stop Button (Only when connected) - OUTSIDE SCROLL AREA */}
-      {connected && (
-           <div className="absolute bottom-6 left-0 right-0 flex justify-center z-50 pointer-events-none">
+        {/* Floating Stop Button (Only when connected) */}
+        {connected && (
+           <div className="absolute bottom-6 left-0 right-0 flex justify-center z-20">
              <button
                onClick={finishSession}
-               className="pointer-events-auto bg-red-500 hover:bg-red-600 text-white px-8 py-4 rounded-full font-bold shadow-2xl shadow-red-500/30 flex items-center gap-2 hover:scale-105 transition-transform border-4 border-slate-50 dark:border-slate-900"
+               className="bg-red-500 hover:bg-red-600 text-white px-8 py-4 rounded-full font-bold shadow-2xl shadow-red-500/30 flex items-center gap-2 hover:scale-105 transition-transform"
              >
                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                Terminar Clase (+{POINTS.live} XP)
              </button>
            </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
