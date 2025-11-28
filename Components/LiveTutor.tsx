@@ -532,6 +532,33 @@ export const LiveTutor: React.FC = () => {
                                 </div>
                             </div>
 
+                            {/* Accent Control - Restored */}
+                            <div>
+                                <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 block">Acento</label>
+                                <div className="bg-slate-100 dark:bg-slate-900 p-1.5 rounded-2xl flex relative border border-slate-200 dark:border-slate-700">
+                                    <button 
+                                        onClick={() => setVoiceAccent('US')}
+                                        className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all relative z-10 focus:outline-none focus:ring-2 focus:ring-brand-500 ${
+                                            voiceAccent === 'US' 
+                                            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-md transform scale-[1.02]' 
+                                            : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                                        }`}
+                                    >
+                                        🇺🇸 USA
+                                    </button>
+                                    <button 
+                                        onClick={() => setVoiceAccent('UK')}
+                                        className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all relative z-10 focus:outline-none focus:ring-2 focus:ring-brand-500 ${
+                                            voiceAccent === 'UK' 
+                                            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-md transform scale-[1.02]' 
+                                            : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                                        }`}
+                                    >
+                                        🇬🇧 UK
+                                    </button>
+                                </div>
+                            </div>
+
                             {/* Level Control - Cards */}
                             <div>
                                 <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 block">Nivel</label>
