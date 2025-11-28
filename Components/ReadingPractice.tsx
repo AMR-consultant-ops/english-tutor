@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { getGeminiClient } from '../services/geminiService';
 import { Type } from '@google/genai';
@@ -254,13 +255,13 @@ export const ReadingPractice: React.FC = () => {
       <div className="h-full flex flex-col items-center justify-center space-y-6 p-8 bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
         <div className="relative">
             <div className="w-20 h-20 border-4 border-slate-200 dark:border-slate-700 rounded-full"></div>
-            <div className="absolute top-0 left-0 w-20 h-20 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
+            <div className="absolute top-0 left-0 w-20 h-20 border-4 border-brand-500 dark:border-brand-400 border-t-transparent rounded-full animate-spin"></div>
         </div>
         <div className="text-center space-y-2 animate-pulse">
             <p className="text-xl font-bold text-slate-900 dark:text-white">
-                {step === 'TOPICS' ? 'Diseñando plan CEFR...' : 'Creando material de lectura...'}
+                {step === 'TOPICS' ? 'Preparando tu lección...' : 'Creando material de lectura...'}
             </p>
-            <p className="text-slate-500 dark:text-slate-400 text-sm">Adaptando al descriptor seleccionado.</p>
+            <p className="text-slate-500 dark:text-slate-400 text-sm">Seleccionando el mejor contenido para ti.</p>
         </div>
       </div>
     );
@@ -283,10 +284,11 @@ export const ReadingPractice: React.FC = () => {
               <button
                 key={t.id}
                 onClick={() => fetchStoryOptions(t.id, t.label, t.cefrGoal)}
-                className={`relative border p-6 rounded-2xl flex flex-col items-center gap-3 transition-all group shadow-sm hover:shadow-lg active:scale-95 min-h-[140px] justify-center ${
+                disabled={loading}
+                className={`relative border p-6 rounded-2xl flex flex-col items-center gap-3 transition-all group shadow-sm hover:shadow-lg active:scale-95 min-h-[140px] justify-center focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:opacity-50 disabled:cursor-not-allowed ${
                   isDone 
                     ? 'bg-brand-50/50 dark:bg-brand-900/10 border-brand-500 dark:border-brand-500/50' 
-                    : 'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 hover:border-brand-500'
+                    : 'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 border-slate-200 dark:border-slate-600 hover:border-brand-500 dark:hover:border-brand-400'
                 }`}
               >
                 {isDone && (
@@ -309,7 +311,7 @@ export const ReadingPractice: React.FC = () => {
     return (
       <div className="p-6 h-full overflow-y-auto bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
         <div className="flex items-center gap-4 mb-6">
-            <button onClick={resetToTopics} className="p-2 bg-white dark:bg-slate-800 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-300 border border-slate-200 dark:border-transparent">
+            <button onClick={resetToTopics} className="p-2 bg-white dark:bg-slate-800 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-300 border border-slate-200 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-500">
                 ←
             </button>
             <div>
@@ -328,10 +330,11 @@ export const ReadingPractice: React.FC = () => {
                 <button
                     key={idx}
                     onClick={() => generateLesson(opt)}
-                    className="w-full text-left bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 border border-slate-200 dark:border-slate-700 hover:border-brand-500/50 p-5 rounded-2xl transition-all shadow-sm hover:shadow-md group active:scale-[0.98]"
+                    disabled={loading}
+                    className="w-full text-left bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 border border-slate-200 dark:border-slate-600 hover:border-brand-500/50 p-5 rounded-2xl transition-all shadow-sm hover:shadow-md group active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <div className="flex justify-between items-start mb-2">
-                        {/* Using text-brand-700 dark:text-brand-200 was too low contrast. Switched to green-700/green-300 */}
+                        {/* High contrast colors */}
                         <span className="font-bold text-lg text-green-700 dark:text-green-300 group-hover:text-green-600 dark:group-hover:text-green-200">{opt.title}</span>
                         <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider border ${badgeColor}`}>
                             {opt.difficulty}
@@ -353,7 +356,7 @@ export const ReadingPractice: React.FC = () => {
       {/* Header */}
       <div className="p-6 bg-white/80 dark:bg-slate-800/50 backdrop-blur border-b border-slate-200 dark:border-slate-700">
         <div className="flex items-center justify-between mb-4">
-           <button onClick={() => setStep('OPTIONS')} className="text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-white text-sm flex items-center gap-1">
+           <button onClick={() => setStep('OPTIONS')} className="text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-white text-sm flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-brand-500 rounded px-1">
              ← Atrás
            </button>
            <span className="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-widest">A1 Practice</span>
@@ -367,7 +370,7 @@ export const ReadingPractice: React.FC = () => {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`flex-1 py-4 text-xs md:text-sm font-bold uppercase tracking-wider transition-colors border-b-2 ${
+            className={`flex-1 py-4 text-xs md:text-sm font-bold uppercase tracking-wider transition-colors border-b-2 focus:outline-none focus:bg-slate-100 dark:focus:bg-slate-800 ${
               activeTab === tab 
                 ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-slate-100 dark:bg-slate-800/50' 
                 : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
@@ -387,7 +390,7 @@ export const ReadingPractice: React.FC = () => {
             <div className="grid gap-3">
               {lesson.vocabulary?.length > 0 ? (
                 lesson.vocabulary.map((item, idx) => (
-                  <div key={idx} className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex justify-between items-center shadow-sm">
+                  <div key={idx} className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-600 flex justify-between items-center shadow-sm">
                     {/* Using high contrast green for better visibility in dark mode */}
                     <span className="text-lg font-bold text-green-700 dark:text-green-300">{item.word}</span>
                     <span className="text-slate-500 dark:text-slate-400 italic">{item.translation}</span>
@@ -399,7 +402,7 @@ export const ReadingPractice: React.FC = () => {
             </div>
             <button 
               onClick={() => setActiveTab('reading')}
-              className="w-full mt-6 bg-brand-600 hover:bg-brand-500 text-white py-4 rounded-xl font-bold shadow-lg"
+              className="w-full mt-6 bg-brand-600 hover:bg-brand-500 text-white py-4 rounded-xl font-bold shadow-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Leer Texto →
             </button>
@@ -408,7 +411,7 @@ export const ReadingPractice: React.FC = () => {
 
         {activeTab === 'reading' && (
           <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
-             <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
+             <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600">
                 {/* Explicitly setting text colors to ensure high contrast */}
                 <p className="text-lg md:text-xl leading-loose text-slate-800 dark:text-slate-200 font-medium font-serif whitespace-pre-wrap">
                   {lesson.story}
@@ -416,7 +419,7 @@ export const ReadingPractice: React.FC = () => {
              </div>
              <button 
               onClick={() => setActiveTab('quiz')}
-              className="w-full bg-brand-600 hover:bg-brand-500 text-white py-4 rounded-xl font-bold shadow-lg"
+              className="w-full bg-brand-600 hover:bg-brand-500 text-white py-4 rounded-xl font-bold shadow-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Preguntas →
             </button>
@@ -433,15 +436,15 @@ export const ReadingPractice: React.FC = () => {
                     const isSelected = quizAnswers[qIdx] === oIdx;
                     const isCorrect = q.correctIndex === oIdx;
                     
-                    let btnClass = "w-full text-left p-4 rounded-xl border transition-all ";
+                    let btnClass = "w-full text-left p-4 rounded-xl border transition-all focus:outline-none focus:ring-2 focus:ring-brand-500 ";
                     
                     if (showResults) {
                       if (isCorrect) btnClass += "bg-green-100 dark:bg-green-500/20 border-green-500 text-green-800 dark:text-green-200";
                       else if (isSelected && !isCorrect) btnClass += "bg-red-100 dark:bg-red-500/20 border-red-500 text-red-800 dark:text-red-200";
-                      else btnClass += "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 opacity-50";
+                      else btnClass += "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-400 opacity-50";
                     } else {
                       if (isSelected) btnClass += "bg-brand-600 border-brand-500 text-white shadow-md transform scale-[1.02]";
-                      else btnClass += "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700";
+                      else btnClass += "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700";
                     }
 
                     return (
@@ -463,12 +466,12 @@ export const ReadingPractice: React.FC = () => {
               <button 
                 onClick={() => setShowResults(true)}
                 disabled={Object.keys(quizAnswers).length < (lesson.questions?.length || 1)}
-                className="w-full bg-brand-600 hover:bg-brand-500 disabled:opacity-50 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold shadow-lg mt-8"
+                className="w-full bg-brand-600 hover:bg-brand-500 disabled:opacity-50 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold shadow-lg mt-8 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
               >
                 Ver Resultados
               </button>
             ) : (
-               <div className="text-center bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 space-y-4 shadow-sm animate-bounce">
+               <div className="text-center bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-600 space-y-4 shadow-sm animate-bounce">
                  <p className="text-slate-800 dark:text-slate-300 text-lg">
                     ¡Lección Completada! 🎉
                  </p>
@@ -480,7 +483,7 @@ export const ReadingPractice: React.FC = () => {
                         markAsComplete(selectedTopicId);
                         resetToTopics();
                     }}
-                    className="w-full bg-brand-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-500 shadow-lg"
+                    className="w-full bg-brand-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-500 shadow-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
                  >
                     Terminar y Guardar Progreso
                  </button>
