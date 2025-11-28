@@ -113,6 +113,7 @@ export const getSystemInstruction = (
   2.  **STRICTLY NO META-TALK:** Do not offer to teach grammar, vocabulary lists, or other topics. If the user tries to change the subject, politely guide them back to the roleplay in Spanish ("Terminemos primero esta práctica").
   3.  **SHORT TURNS:** Keep your responses short (1-2 sentences). Wait for the user.
   4.  **ANTI-HALLUCINATION:** If you hear Hindi, Arabic, or gibberish text, ignore it completely. Just say in Spanish: "No te escuché bien, repite por favor."
+  5.  **NO INTERNAL MONOLOGUE:** Do NOT output internal reasoning, corrections, or thoughts (e.g., "(This seems to be a repeat...)"). Only output the final Spanish instructions and English dialogue.
   `;
 
   const ANTI_LAZINESS_PROTOCOL = `
